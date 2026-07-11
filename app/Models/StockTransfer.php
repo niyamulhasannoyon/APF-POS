@@ -7,12 +7,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
-#[Fillable(['from_branch_id', 'to_branch_id', 'status', 'user_id', 'notes', 'shipped_at', 'completed_at'])]
+#[Fillable(['offline_id', 'from_branch_id', 'to_branch_id', 'status', 'user_id', 'notes', 'shipped_at', 'completed_at', 'synced_at'])]
 class StockTransfer extends Model
 {
     protected $casts = [
         'shipped_at' => 'datetime',
-        'completed_at' => 'datetime'
+        'completed_at' => 'datetime',
+        'synced_at' => 'datetime',
     ];
 
     public function fromBranch(): BelongsTo

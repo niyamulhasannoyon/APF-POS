@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
-#[Fillable(['branch_id', 'product_id', 'product_variant_id', 'user_id', 'quantity_adjusted', 'reason_code', 'notes'])]
+#[Fillable(['offline_id', 'branch_id', 'product_id', 'product_variant_id', 'user_id', 'quantity_adjusted', 'reason_code', 'notes', 'synced_at'])]
 class StockAdjustment extends Model
 {
     protected $casts = [
-        'quantity_adjusted' => 'float'
+        'quantity_adjusted' => 'float',
+        'synced_at' => 'datetime',
     ];
 
     public function branch(): BelongsTo

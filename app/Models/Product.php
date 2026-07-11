@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
-#[Fillable(['name', 'sku', 'barcode', 'price', 'cost', 'category_id', 'image_url', 'status'])]
+#[Fillable(['name', 'sku', 'barcode', 'price', 'cost', 'category_id', 'brand_id', 'tax_id', 'image_url', 'status'])]
 class Product extends Model
 {
     protected function casts(): array
@@ -21,6 +21,16 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
+
+    public function tax()
+    {
+        return $this->belongsTo(Tax::class);
     }
 
     public function branches()

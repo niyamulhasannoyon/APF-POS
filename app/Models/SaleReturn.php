@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
 #[Fillable([
@@ -11,28 +10,19 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
     'branch_id',
     'user_id',
     'customer_id',
-    'subtotal',
-    'tax_amount',
-    'discount_amount',
-    'total_amount',
-    'payment_method',
-    'payment_status',
+    'order_id',
+    'refund_amount',
+    'refund_method',
     'status',
     'notes',
     'synced_at',
-    'created_at',
 ])]
-class Order extends Model
+class SaleReturn extends Model
 {
     protected function casts(): array
     {
         return [
-            'subtotal' => 'decimal:2',
-            'tax_amount' => 'decimal:2',
-            'discount_amount' => 'decimal:2',
-            'total_amount' => 'decimal:2',
             'synced_at' => 'datetime',
-            'created_at' => 'datetime',
         ];
     }
 
@@ -51,18 +41,13 @@ class Order extends Model
         return $this->belongsTo(Customer::class);
     }
 
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
     public function items()
     {
-        return $this->hasMany(OrderItem::class);
-    }
-
-    public function saleReturns()
-    {
-        return $this->hasMany(SaleReturn::class);
-    }
-
-    public function salePayments()
-    {
-        return $this->hasMany(SalePayment::class);
+        return $this->hasMany(SaleReturnItem::class);
     }
 }
