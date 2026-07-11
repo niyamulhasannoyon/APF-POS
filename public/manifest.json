@@ -1,0 +1,19 @@
+{
+    "name": "APF Point of Sale Terminal",
+    "short_name": "APF POS",
+    "description": "Offline-resilient high-speed self-hosted POS cashier screen",
+    "start_url": "/pos",
+    "display": "standalone",
+    "orientation": "any",
+    "background_color": "#0f172a",
+    "theme_color": "#0f172a",
+    "categories": ["business", "productivity"],
+    "icons": [
+        {
+            "src": "https://cdn-icons-png.flaticon.com/512/10522/10522198.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
