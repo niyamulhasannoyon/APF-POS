@@ -39,4 +39,9 @@ return [
     'cogs' => 'Cost of Goods Sold (COGS)',
     'gross_profit_margin' => 'Gross Profit Margin',
     'profit_percentage' => 'Profit Percentage',
+    'transfers' => 'Stock Transfers',
+    'suppliers' => 'Suppliers',
+    'purchases' => 'Purchases',
+    'staff' => 'Staff Management',
+    'reports' => 'Reports & Analytics',
 ];

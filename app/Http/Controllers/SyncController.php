@@ -46,14 +46,14 @@ class SyncController extends Controller
         $categories = $categoriesQuery->get();
 
         // 2. Customers
-        $customersQuery = Customer::query();
+        $customersQuery = Customer::query()->with('group');
         if ($lastSyncTime) {
             $customersQuery->where('updated_at', '>', $lastSyncTime);
         }
         $customers = $customersQuery->get();
 
         // 3. Products with branch stock
-        $productsQuery = Product::where('status', true);
+        $productsQuery = Product::where('status', true)->with('variants');
         if ($lastSyncTime) {
             $productsQuery->where('updated_at', '>', $lastSyncTime);
         }
@@ -63,6 +63,24 @@ class SyncController extends Controller
                 ->where('branch_id', $branchId)
                 ->where('product_id', $product->id)
                 ->value('stock_quantity') ?? 0.00;
+
+            // Map variants with their respective branch stock levels
+            $variants = $product->variants->map(function ($variant) use ($branchId) {
+                $variantStock = DB::table('branch_variant')
+                    ->where('branch_id', $branchId)
+                    ->where('product_variant_id', $variant->id)
+                    ->value('stock_quantity') ?? 0.00;
+
+                return [
+                    'id' => $variant->id,
+                    'sku' => $variant->sku,
+                    'barcode' => $variant->barcode,
+                    'option_values' => $variant->option_values,
+                    'cost' => (float)$variant->cost,
+                    'price' => (float)$variant->price,
+                    'stock_quantity' => (float)$variantStock
+                ];
+            });
 
             return [
                 'id' => $product->id,
@@ -75,6 +93,7 @@ class SyncController extends Controller
                 'image_url' => $product->image_url,
                 'status' => $product->status,
                 'stock_quantity' => (float)$stock,
+                'variants' => $variants,
             ];
         });
 
@@ -104,6 +123,7 @@ class SyncController extends Controller
             'orders.*.payment_method' => 'required|string',
             'orders.*.items' => 'required|array|min:1',
             'orders.*.items.*.product_id' => 'required|exists:products,id',
+            'orders.*.items.*.product_variant_id' => 'nullable|exists:product_variants,id',
             'orders.*.items.*.quantity' => 'required|numeric|min:0.01',
             'orders.*.items.*.price' => 'required|numeric',
             'orders.*.items.*.cost' => 'required|numeric',
@@ -149,6 +169,7 @@ class SyncController extends Controller
                         OrderItem::create([
                             'order_id' => $order->id,
                             'product_id' => $itemData['product_id'],
+                            'product_variant_id' => $itemData['product_variant_id'] ?? null,
                             'quantity' => $itemData['quantity'],
                             'price' => $itemData['price'],
                             'cost' => $itemData['cost'],
@@ -157,10 +178,17 @@ class SyncController extends Controller
                         ]);
 
                         // Decrement branch stock
-                        DB::table('branch_product')
-                            ->where('branch_id', $orderData['branch_id'])
-                            ->where('product_id', $itemData['product_id'])
-                            ->decrement('stock_quantity', $itemData['quantity']);
+                        if (!empty($itemData['product_variant_id'])) {
+                            DB::table('branch_variant')
+                                ->where('branch_id', $orderData['branch_id'])
+                                ->where('product_variant_id', $itemData['product_variant_id'])
+                                ->decrement('stock_quantity', $itemData['quantity']);
+                        } else {
+                            DB::table('branch_product')
+                                ->where('branch_id', $orderData['branch_id'])
+                                ->where('product_id', $itemData['product_id'])
+                                ->decrement('stock_quantity', $itemData['quantity']);
+                        }
                     }
 
                     // Award Loyalty Points (e.g. 1 point per $10 spent)
@@ -170,6 +198,18 @@ class SyncController extends Controller
                             Customer::where('id', $orderData['customer_id'])
                                 ->increment('loyalty_points', $points);
                         }
+                    }
+
+                    // Log Sales Commission for Cashier
+                    $cashier = \App\Models\User::find($orderData['user_id']);
+                    if ($cashier && $cashier->commission_rate > 0) {
+                        $commissionAmount = ($orderData['total_amount'] * $cashier->commission_rate) / 100;
+                        \App\Models\SalesCommission::create([
+                            'user_id' => $cashier->id,
+                            'order_id' => $order->id,
+                            'commission_amount' => $commissionAmount,
+                            'status' => 'pending'
+                        ]);
                     }
 
                     $syncedIds[] = $offlineId;

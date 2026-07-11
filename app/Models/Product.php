@@ -34,4 +34,29 @@ class Product extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    public function units()
+    {
+        return $this->hasMany(ProductUnit::class);
+    }
+
+    public function batches()
+    {
+        return $this->hasMany(ProductBatch::class);
+    }
+
+    public function serials()
+    {
+        return $this->hasMany(ProductSerial::class);
+    }
+
+    public function purchaseOrderItems()
+    {
+        return $this->hasMany(PurchaseOrderItem::class);
+    }
 }

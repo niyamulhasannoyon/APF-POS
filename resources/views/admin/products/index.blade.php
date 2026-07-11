@@ -1,12 +1,28 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Inventory Management') }}
             </h2>
-            <a href="{{ route('admin.products.create') }}" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold shadow-md transition duration-150 ease-in-out text-sm">
-                + Add New Product
-            </a>
+            <div class="flex flex-wrap items-center gap-3">
+                <!-- CSV Export -->
+                <a href="{{ route('admin.products.export') }}" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 border border-slate-300 text-slate-700 rounded-lg font-semibold transition text-xs flex items-center gap-1.5">
+                    📥 Export CSV
+                </a>
+
+                <!-- CSV Import Form -->
+                <form action="{{ route('admin.products.import') }}" method="POST" enctype="multipart/form-data" class="flex items-center gap-2 border border-slate-300 bg-slate-50 px-2 py-1 rounded-lg">
+                    @csrf
+                    <input type="file" name="csv_file" accept=".csv" required class="text-[10px] w-36 cursor-pointer text-slate-600 outline-none">
+                    <button type="submit" class="px-2 py-1 bg-gray-800 hover:bg-gray-700 text-white rounded text-[10px] font-bold transition">
+                        Upload CSV
+                    </button>
+                </form>
+
+                <a href="{{ route('admin.products.create') }}" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold shadow-md transition duration-150 ease-in-out text-xs">
+                    + Add New Product
+                </a>
+            </div>
         </div>
     </x-slot>
 

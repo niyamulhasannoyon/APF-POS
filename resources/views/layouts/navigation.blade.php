@@ -21,6 +21,21 @@
                     <x-nav-link :href="route('admin.products.index')" :active="request()->routeIs('admin.products.*')">
                         {{ __('messages.inventory') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('admin.transfers.index')" :active="request()->routeIs('admin.transfers.*')">
+                        {{ __('messages.transfers') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('admin.suppliers.index')" :active="request()->routeIs('admin.suppliers.*')">
+                        {{ __('messages.suppliers') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('admin.purchases.index')" :active="request()->routeIs('admin.purchases.*')">
+                        {{ __('messages.purchases') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('admin.staff.index')" :active="request()->routeIs('admin.staff.*')">
+                        {{ __('messages.staff') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('admin.reports.index')" :active="request()->routeIs('admin.reports.*')">
+                        {{ __('messages.reports') }}
+                    </x-nav-link>
                     <x-nav-link :href="route('admin.customers.index')" :active="request()->routeIs('admin.customers.*')">
                         {{ __('messages.customers') }}
                     </x-nav-link>

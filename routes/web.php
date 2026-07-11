@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\SyncController;
+use App\Http\Controllers\InventoryImportExportController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -42,6 +43,13 @@ Route::middleware('auth')->group(function () {
         Route::get('/products/create', [ProductController::class, 'create'])->name('products.create');
         Route::post('/products', [ProductController::class, 'store'])->name('products.store');
         Route::post('/products/adjust-stock', [ProductController::class, 'adjustStock'])->name('products.adjust-stock');
+        Route::get('/products/export', [InventoryImportExportController::class, 'export'])->name('products.export');
+        Route::post('/products/import', [InventoryImportExportController::class, 'import'])->name('products.import');
+        Route::get('/transfers', function () { return view('admin.transfers.index'); })->name('transfers.index');
+        Route::get('/suppliers', function () { return view('admin.suppliers.index'); })->name('suppliers.index');
+        Route::get('/purchases', function () { return view('admin.purchases.index'); })->name('purchases.index');
+        Route::get('/staff', function () { return view('admin.staff.index'); })->name('staff.index');
+        Route::get('/reports', function () { return view('admin.reports.index'); })->name('reports.index');
 
         // Customers
         Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
@@ -55,6 +63,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/pos', function () {
         return view('pos.index');
     })->name('pos.index');
+
+    Route::get('/pos/customer-display', function () {
+        return view('pos.customer-display');
+    })->name('pos.customer-display');
 });
 
 require __DIR__.'/auth.php';

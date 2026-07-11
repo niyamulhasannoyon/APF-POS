@@ -25,4 +25,31 @@ class Branch extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    public function variants()
+    {
+        return $this->belongsToMany(ProductVariant::class, 'branch_variant')
+                    ->withPivot('stock_quantity')
+                    ->withTimestamps();
+    }
+
+    public function batches()
+    {
+        return $this->hasMany(ProductBatch::class);
+    }
+
+    public function outgoingTransfers()
+    {
+        return $this->hasMany(StockTransfer::class, 'from_branch_id');
+    }
+
+    public function incomingTransfers()
+    {
+        return $this->hasMany(StockTransfer::class, 'to_branch_id');
+    }
+
+    public function purchaseOrders()
+    {
+        return $this->hasMany(PurchaseOrder::class);
+    }
 }

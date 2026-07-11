@@ -39,4 +39,9 @@ return [
     'cogs' => 'বিক্রিত পণ্যের ব্যয় (COGS)',
     'gross_profit_margin' => 'মোট লাভের মার্জিন',
     'profit_percentage' => 'লাভের শতকরা হার',
+    'transfers' => 'স্টক স্থানান্তর',
+    'suppliers' => 'সরবরাহকারী',
+    'purchases' => 'ক্রয়',
+    'staff' => 'স্টাফ ম্যানেজমেন্ট',
+    'reports' => 'রিপোর্ট ও বিশ্লেষণ',
 ];
