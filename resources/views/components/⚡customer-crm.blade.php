@@ -179,63 +179,63 @@ new class extends Component
 
 <div>
     <!-- Tab Navigation -->
-    <div class="border-b border-gray-200 mb-6 flex gap-4">
-        <button wire:click="$set('activeTab', 'customers')" class="py-2.5 px-4 font-semibold text-xs transition border-b-2" :class="'{{ $activeTab }}' === 'customers' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'">
+    <div class="border-b border-slate-800 mb-6 flex gap-4">
+        <button wire:click="$set('activeTab', 'customers')" class="py-2.5 px-4 font-semibold text-xs transition border-b-2" :class="'{{ $activeTab }}' === 'customers' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'">
             👥 Customers Ledger
         </button>
-        <button wire:click="$set('activeTab', 'groups')" class="py-2.5 px-4 font-semibold text-xs transition border-b-2" :class="'{{ $activeTab }}' === 'groups' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'">
+        <button wire:click="$set('activeTab', 'groups')" class="py-2.5 px-4 font-semibold text-xs transition border-b-2" :class="'{{ $activeTab }}' === 'groups' ? 'border-indigo-500 text-indigo-400' : 'border-transparent text-slate-400 hover:text-slate-200'">
             💎 Customer Tiers & Pricing
         </button>
     </div>
 
     @if($activeTab === 'customers')
         <!-- Customer Tab action bar -->
-        <div class="bg-white p-4 shadow-sm sm:rounded-lg border border-gray-150 flex flex-col md:flex-row gap-4 items-center justify-between mb-6">
+        <div class="glass-card flex flex-col md:flex-row gap-4 items-center justify-between mb-6 p-4.5">
             <div class="w-full md:w-1/3">
-                <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search by name or phone..." class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 text-sm">
+                <input type="text" wire:model.live.debounce.300ms="search" placeholder="Search by name or phone..." class="block w-full">
             </div>
         </div>
 
         <!-- Customers List Table -->
-        <div class="bg-white shadow-sm sm:rounded-lg border border-gray-150 overflow-hidden">
-            <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
-                <thead class="bg-gray-50 text-gray-500 font-bold uppercase text-[10px]">
-                    <tr>
-                        <th class="px-6 py-3">Client Details</th>
-                        <th class="px-6 py-3">Pricing Tier</th>
-                        <th class="px-6 py-3">Loyalty Points</th>
-                        <th class="px-6 py-3">Store Credit</th>
-                        <th class="px-6 py-3">Outstanding Dues</th>
-                        <th class="px-6 py-3 text-right">Actions</th>
+        <div class="glass-card p-0 overflow-hidden">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-900/40">
+                        <th class="px-6 py-3.5">Client Details</th>
+                        <th class="px-6 py-3.5">Pricing Tier</th>
+                        <th class="px-6 py-3.5">Loyalty Points</th>
+                        <th class="px-6 py-3.5">Store Credit</th>
+                        <th class="px-6 py-3.5">Outstanding Dues</th>
+                        <th class="px-6 py-3.5 text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 bg-white">
+                <tbody class="divide-y divide-slate-800/40">
                     @forelse($this->getCustomers() as $cust)
-                        <tr class="hover:bg-gray-50/50">
+                        <tr class="hover:bg-slate-900/20 transition-colors duration-150">
                             <td class="px-6 py-4">
-                                <div class="font-semibold text-gray-900">{{ $cust->name }}</div>
-                                <div class="text-xs text-gray-500 font-medium">{{ $cust->phone ?: '-' }} • {{ $cust->email ?: '-' }}</div>
+                                <div class="font-bold text-slate-200 text-sm">{{ $cust->name }}</div>
+                                <div class="text-xs text-slate-500 mt-1 font-semibold">{{ $cust->phone ?: '-' }} • <span class="font-mono">{{ $cust->email ?: '-' }}</span></div>
                             </td>
                             <td class="px-6 py-4">
-                                <span class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded font-bold">
+                                <span class="text-xs bg-indigo-500/10 text-indigo-300 px-2.5 py-1 rounded-md font-bold border border-indigo-500/20">
                                     {{ $cust->group->name ?? 'Retail Pricing' }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 font-semibold text-indigo-900">{{ $cust->loyalty_points }} pts</td>
-                            <td class="px-6 py-4 font-bold text-emerald-600">${{ number_format($cust->store_credit, 2) }}</td>
-                            <td class="px-6 py-4 font-bold text-rose-600">${{ number_format($cust->outstanding_dues, 2) }}</td>
+                            <td class="px-6 py-4 font-bold text-indigo-400 font-mono">{{ $cust->loyalty_points }} pts</td>
+                            <td class="px-6 py-4 font-bold text-emerald-400 font-mono">${{ number_format($cust->store_credit, 2) }}</td>
+                            <td class="px-6 py-4 font-bold text-rose-450 font-mono">${{ number_format($cust->outstanding_dues, 2) }}</td>
                             <td class="px-6 py-4 text-right flex justify-end gap-2">
-                                <button wire:click="openAdjustment({{ $cust->id }})" class="px-3 py-1.5 bg-gray-800 hover:bg-gray-700 text-white rounded text-xs font-bold transition">
+                                <button wire:click="openAdjustment({{ $cust->id }})" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-bold transition duration-150">
                                     Adjust Balance
                                 </button>
-                                <button wire:click="openCustomerEdit({{ $cust->id }})" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-xs font-semibold transition">
+                                <button wire:click="openCustomerEdit({{ $cust->id }})" class="px-3 py-1.5 bg-slate-800/40 hover:bg-slate-700 text-slate-350 hover:text-slate-100 border border-slate-700/60 rounded-lg text-xs font-semibold transition duration-150">
                                     Edit Profile
                                 </button>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center text-gray-400 py-12 text-xs">No customer profiles registered.</td>
+                            <td colspan="6" class="text-center text-slate-500 py-12 text-xs">No customer profiles registered.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -243,37 +243,37 @@ new class extends Component
         </div>
     @else
         <!-- Pricing groups tab action bar -->
-        <div class="bg-white p-4 shadow-sm sm:rounded-lg border border-gray-150 flex justify-between items-center mb-6">
-            <h4 class="text-sm font-bold text-gray-700">Client Tiers</h4>
-            <button wire:click="openGroupCreate" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-bold transition text-xs">
+        <div class="glass-card flex justify-between items-center mb-6 p-4.5">
+            <h4 class="text-sm font-bold text-slate-200">Client Tiers</h4>
+            <button wire:click="openGroupCreate" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold shadow-lg shadow-indigo-500/10 transition duration-150 text-xs">
                 + Create Pricing Tier
             </button>
         </div>
 
         <!-- Groups Table -->
-        <div class="bg-white shadow-sm sm:rounded-lg border border-gray-150 overflow-hidden">
-            <table class="min-w-full divide-y divide-gray-200 text-left text-sm">
-                <thead class="bg-gray-50 text-gray-500 font-bold uppercase text-[10px]">
-                    <tr>
-                        <th class="px-6 py-3">Tier Name</th>
-                        <th class="px-6 py-3">Default Discount</th>
-                        <th class="px-6 py-3 text-right">Actions</th>
+        <div class="glass-card p-0 overflow-hidden">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="border-b border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider bg-slate-900/40">
+                        <th class="px-6 py-3.5">Tier Name</th>
+                        <th class="px-6 py-3.5">Default Discount</th>
+                        <th class="px-6 py-3.5 text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100 bg-white">
+                <tbody class="divide-y divide-slate-800/40">
                     @forelse($this->getGroups() as $grp)
-                        <tr class="hover:bg-gray-50/50">
-                            <td class="px-6 py-4 font-semibold text-gray-900">{{ $grp->name }}</td>
-                            <td class="px-6 py-4 text-gray-700 font-bold">{{ $grp->discount_percentage }}% Discount</td>
+                        <tr class="hover:bg-slate-900/20 transition-colors duration-150">
+                            <td class="px-6 py-4 font-bold text-slate-200">{{ $grp->name }}</td>
+                            <td class="px-6 py-4 text-emerald-400 font-bold font-mono">{{ $grp->discount_percentage }}% Discount</td>
                             <td class="px-6 py-4 text-right">
-                                <button wire:click="openGroupEdit({{ $grp->id }})" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded text-xs font-semibold transition">
+                                <button wire:click="openGroupEdit({{ $grp->id }})" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold transition duration-150">
                                     Edit Tier
                                 </button>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" class="text-center text-gray-400 py-12 text-xs">No client pricing tiers configured.</td>
+                            <td colspan="3" class="text-center text-slate-500 py-12 text-xs">No client pricing tiers configured.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -282,26 +282,26 @@ new class extends Component
     @endif
 
     <!-- Pricing Group Modal -->
-    <div x-data="{ show: @entangle('isGroupOpen') }">
-        <div x-show="show" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50" style="display: none;">
-            <div @click.away="$wire.isGroupOpen = false" class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden animate-[scaleUp_0.15s]">
-                <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-                    <h3 class="text-base font-bold text-gray-900">{{ $groupId ? 'Edit Tier' : 'Create Pricing Tier' }}</h3>
-                    <button @click="$wire.isGroupOpen = false" class="text-gray-400 hover:text-gray-600">&times;</button>
+    <div x-data=" { show: @entangle('isGroupOpen') }">
+        <div x-show="show" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50" style="display: none;">
+            <div @click.away="$wire.isGroupOpen = false" class="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
+                <div class="px-6 py-4 border-b border-slate-800/80 flex justify-between items-center bg-slate-950/40">
+                    <h3 class="text-base font-extrabold text-slate-100">{{ $groupId ? 'Edit Tier' : 'Create Pricing Tier' }}</h3>
+                    <button @click="$wire.isGroupOpen = false" class="text-slate-400 hover:text-slate-200 text-xl font-bold">&times;</button>
                 </div>
                 <div class="p-6">
                     <form wire:submit.prevent="saveGroup" class="space-y-4">
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700">Tier Name *</label>
-                            <input type="text" wire:model="groupName" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 text-sm">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tier Name *</label>
+                            <input type="text" wire:model="groupName" required class="block w-full">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700">Discount Percentage (%) *</label>
-                            <input type="number" wire:model="discountPercentage" required min="0" max="100" step="0.01" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 text-sm">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Discount Percentage (%) *</label>
+                            <input type="number" wire:model="discountPercentage" required min="0" max="100" step="0.01" class="block w-full font-mono">
                         </div>
-                        <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                            <button type="button" @click="$wire.isGroupOpen = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-755 rounded font-semibold text-xs transition">Cancel</button>
-                            <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-bold transition text-xs">Save Tier</button>
+                        <div class="flex justify-end gap-3 pt-4 border-t border-slate-800/80">
+                            <button type="button" @click="$wire.isGroupOpen = false" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg font-semibold text-xs transition duration-150">Cancel</button>
+                            <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold transition text-xs shadow-lg shadow-indigo-600/10">Save Tier</button>
                         </div>
                     </form>
                 </div>
@@ -311,29 +311,29 @@ new class extends Component
 
     <!-- Customer Edit Modal -->
     <div x-data="{ show: @entangle('isCustomerOpen') }">
-        <div x-show="show" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50" style="display: none;">
-            <div @click.away="$wire.isCustomerOpen = false" class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden animate-[scaleUp_0.15s]">
-                <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-                    <h3 class="text-base font-bold text-gray-900">Edit Customer Profile</h3>
-                    <button @click="$wire.isCustomerOpen = false" class="text-gray-400 hover:text-gray-600">&times;</button>
+        <div x-show="show" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50" style="display: none;">
+            <div @click.away="$wire.isCustomerOpen = false" class="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
+                <div class="px-6 py-4 border-b border-slate-800/80 flex justify-between items-center bg-slate-950/40">
+                    <h3 class="text-base font-extrabold text-slate-100">Edit Customer Profile</h3>
+                    <button @click="$wire.isCustomerOpen = false" class="text-slate-400 hover:text-slate-200 text-xl font-bold">&times;</button>
                 </div>
                 <div class="p-6">
                     <form wire:submit.prevent="saveCustomer" class="space-y-4">
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700">Customer Name *</label>
-                            <input type="text" wire:model="name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 text-sm">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Customer Name *</label>
+                            <input type="text" wire:model="name" required class="block w-full">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700">Phone</label>
-                            <input type="text" wire:model="phone" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 text-sm">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Phone</label>
+                            <input type="text" wire:model="phone" class="block w-full font-mono">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700">Email</label>
-                            <input type="email" wire:model="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 text-sm">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Email</label>
+                            <input type="email" wire:model="email" class="block w-full font-mono">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700">Pricing Group</label>
-                            <select wire:model="customerGroupId" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 text-sm">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Pricing Group</label>
+                            <select wire:model="customerGroupId" class="block w-full">
                                 <option value="">Retail / None</option>
                                 @foreach($this->getGroups() as $g)
                                     <option value="{{ $g->id }}">{{ $g->name }} ({{ $g->discount_percentage }}% Off)</option>
@@ -341,12 +341,12 @@ new class extends Component
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700">Loyalty Points Balance *</label>
-                            <input type="number" wire:model="loyaltyPoints" required min="0" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 text-sm">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Loyalty Points Balance *</label>
+                            <input type="number" wire:model="loyaltyPoints" required min="0" class="block w-full font-mono">
                         </div>
-                        <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                            <button type="button" @click="$wire.isCustomerOpen = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-755 rounded font-semibold text-xs transition">Cancel</button>
-                            <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-bold transition text-xs">Save Profile</button>
+                        <div class="flex justify-end gap-3 pt-4 border-t border-slate-800/80">
+                            <button type="button" @click="$wire.isCustomerOpen = false" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg font-semibold text-xs transition duration-150">Cancel</button>
+                            <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold transition text-xs shadow-lg shadow-indigo-600/10">Save Profile</button>
                         </div>
                     </form>
                 </div>
@@ -356,21 +356,21 @@ new class extends Component
 
     <!-- Credit/Dues Adjustment Modal -->
     <div x-data="{ show: @entangle('isAdjustmentOpen') }">
-        <div x-show="show" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50" style="display: none;">
-            <div @click.away="$wire.isAdjustmentOpen = false" class="bg-white rounded-lg shadow-xl w-full max-w-md overflow-hidden animate-[scaleUp_0.15s]">
-                <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-                    <h3 class="text-base font-bold text-gray-900">Adjust Customer Ledger</h3>
-                    <button @click="$wire.isAdjustmentOpen = false" class="text-gray-400 hover:text-gray-600">&times;</button>
+        <div x-show="show" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50" style="display: none;">
+            <div @click.away="$wire.isAdjustmentOpen = false" class="bg-slate-900 border border-slate-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
+                <div class="px-6 py-4 border-b border-slate-800/80 flex justify-between items-center bg-slate-950/40">
+                    <h3 class="text-base font-extrabold text-slate-100">Adjust Customer Ledger</h3>
+                    <button @click="$wire.isAdjustmentOpen = false" class="text-slate-400 hover:text-slate-200 text-xl font-bold">&times;</button>
                 </div>
                 <div class="p-6">
-                    <div class="bg-slate-50 text-gray-800 p-3 rounded mb-4 text-xs font-semibold">
-                        Customer: <strong class="text-slate-950">{{ $adjCustomerName }}</strong>
+                    <div class="bg-slate-950/60 text-slate-300 border border-slate-800/85 p-3 rounded-lg mb-4 text-xs font-semibold">
+                        Customer: <strong class="text-indigo-400">{{ $adjCustomerName }}</strong>
                     </div>
 
                     <form wire:submit.prevent="submitAdjustment" class="space-y-4">
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700">Adjustment Type *</label>
-                            <select wire:model="adjType" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 text-sm">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Adjustment Type *</label>
+                            <select wire:model="adjType" required class="block w-full">
                                 <option value="credit_added">Add Store Credit (+)</option>
                                 <option value="credit_used">Deduct Store Credit (-)</option>
                                 <option value="due_added">Log Unpaid Due Balance (+)</option>
@@ -379,18 +379,18 @@ new class extends Component
                         </div>
 
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700">Amount ($) *</label>
-                            <input type="number" wire:model="adjAmount" required min="0.01" step="0.01" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 text-sm">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Amount ($) *</label>
+                            <input type="number" wire:model="adjAmount" required min="0.01" step="0.01" class="block w-full font-mono">
                         </div>
 
                         <div>
-                            <label class="block text-xs font-semibold text-gray-700">Notes / Reason</label>
-                            <textarea wire:model="adjNotes" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 text-sm" placeholder="Reason details..."></textarea>
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Notes / Reason</label>
+                            <textarea wire:model="adjNotes" rows="2" class="block w-full" placeholder="Reason details..."></textarea>
                         </div>
 
-                        <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
-                            <button type="button" @click="$wire.isAdjustmentOpen = false" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-755 rounded font-semibold text-xs transition">Cancel</button>
-                            <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-bold transition text-xs">Save Adjustment</button>
+                        <div class="flex justify-end gap-3 pt-4 border-t border-slate-800/80">
+                            <button type="button" @click="$wire.isAdjustmentOpen = false" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg font-semibold text-xs transition duration-150">Cancel</button>
+                            <button type="submit" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold transition text-xs shadow-lg shadow-indigo-600/10">Save Adjustment</button>
                         </div>
                     </form>
                 </div>

@@ -1,3 +1,90 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    body {
+        @apply bg-slate-950 text-slate-100 antialiased min-h-screen selection:bg-indigo-500 selection:text-white;
+        background-image: 
+            radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
+            radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.03) 0px, transparent 50%);
+    }
+
+    /* Customize scrollbar */
+    ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+        @apply bg-slate-950/40;
+    }
+    ::-webkit-scrollbar-thumb {
+        @apply bg-slate-800 rounded-full hover:bg-slate-700 transition-colors;
+    }
+
+    /* Input overrides */
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="password"],
+    input[type="date"],
+    select,
+    textarea {
+        @apply bg-slate-900/60 border-slate-700/80 text-slate-100 rounded-lg text-sm transition-all focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/30 placeholder-slate-500;
+    }
+
+    select option {
+        @apply bg-slate-900 text-slate-100;
+    }
+}
+
+@layer components {
+    .glass-card {
+        @apply bg-slate-900/50 backdrop-blur-md border border-slate-800/80 shadow-2xl rounded-xl p-6 transition-all duration-300;
+    }
+
+    .glass-card-hover {
+        @apply hover:border-indigo-500/30 hover:shadow-indigo-500/5 hover:-translate-y-0.5;
+    }
+
+    .btn-indigo {
+        @apply px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white rounded-lg font-bold shadow-lg shadow-indigo-600/15 hover:shadow-indigo-500/25 transition-all duration-200 text-xs;
+    }
+
+    .btn-emerald {
+        @apply px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-lg font-bold shadow-lg shadow-emerald-600/15 hover:shadow-emerald-500/25 transition-all duration-200 text-xs;
+    }
+
+    .btn-secondary {
+        @apply px-4 py-2.5 bg-slate-800 hover:bg-slate-700 active:bg-slate-750 text-slate-200 border border-slate-700 rounded-lg font-semibold transition-all duration-200 text-xs;
+    }
+
+    .table-dark {
+        @apply min-w-full divide-y divide-slate-800/60 text-left text-sm;
+    }
+
+    .table-dark-header {
+        @apply bg-slate-900/80 text-slate-400 font-bold uppercase text-[10px] tracking-wider;
+    }
+
+    .table-dark-row {
+        @apply hover:bg-slate-900/30 transition-colors duration-150;
+    }
+
+    .badge-primary {
+        @apply text-xs bg-indigo-500/10 text-indigo-300 px-2.5 py-1 rounded-md font-semibold border border-indigo-500/20;
+    }
+
+    .badge-emerald {
+        @apply text-xs bg-emerald-500/10 text-emerald-300 px-2.5 py-1 rounded-md font-semibold border border-emerald-500/20;
+    }
+
+    .badge-rose {
+        @apply text-xs bg-rose-500/10 text-rose-300 px-2.5 py-1 rounded-md font-semibold border border-rose-500/20;
+    }
+
+    .badge-amber {
+        @apply text-xs bg-amber-500/10 text-amber-300 px-2.5 py-1 rounded-md font-semibold border border-amber-500/20;
+    }
+}
+

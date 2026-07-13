@@ -1,49 +1,49 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            <h2 class="font-extrabold text-xl text-slate-100 leading-tight">
                 {{ __('Branches Management') }}
             </h2>
-            <a href="{{ route('admin.branches.create') }}" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold shadow-md transition duration-150 ease-in-out text-sm">
+            <a href="{{ route('admin.branches.create') }}" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold shadow-lg shadow-indigo-500/10 transition duration-150 text-xs">
                 + Create New Branch
             </a>
         </div>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             @if(session('success'))
-                <div class="mb-6 p-4 bg-emerald-100 border-l-4 border-emerald-500 text-emerald-800 rounded-r-lg shadow-sm">
+                <div class="mb-6 p-4 bg-emerald-500/10 border-l-4 border-emerald-500 text-emerald-400 rounded-r-lg shadow border border-emerald-500/20 text-xs font-semibold">
                     {{ session('success') }}
                 </div>
             @endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
+            <div class="glass-card">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="border-b border-gray-200">
-                                <th class="py-3 px-4 text-sm font-bold text-gray-500">Branch Name</th>
-                                <th class="py-3 px-4 text-sm font-bold text-gray-500">Address</th>
-                                <th class="py-3 px-4 text-sm font-bold text-gray-500">Contact Phone</th>
-                                <th class="py-3 px-4 text-sm font-bold text-gray-500 text-center">Assigned Staff</th>
-                                <th class="py-3 px-4 text-sm font-bold text-gray-500 text-center">Status</th>
+                            <tr class="border-b border-slate-800 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                <th class="py-3 px-4">Branch Name</th>
+                                <th class="py-3 px-4">Address</th>
+                                <th class="py-3 px-4">Contact Phone</th>
+                                <th class="py-3 px-4 text-center">Assigned Staff</th>
+                                <th class="py-3 px-4 text-center">Status</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody class="divide-y divide-slate-800/40">
                             @forelse($branches as $branch)
-                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
-                                    <td class="py-4 px-4 text-sm text-gray-900 font-bold">{{ $branch->name }}</td>
-                                    <td class="py-4 px-4 text-sm text-gray-600">{{ $branch->address ?? 'N/A' }}</td>
-                                    <td class="py-4 px-4 text-sm text-gray-600 font-mono">{{ $branch->phone ?? 'N/A' }}</td>
-                                    <td class="py-4 px-4 text-sm text-gray-600 text-center font-semibold">{{ $branch->users_count }} staff</td>
+                                <tr class="hover:bg-slate-900/20 transition-colors duration-150">
+                                    <td class="py-4 px-4 text-sm text-slate-200 font-bold">{{ $branch->name }}</td>
+                                    <td class="py-4 px-4 text-sm text-slate-400">{{ $branch->address ?? 'N/A' }}</td>
+                                    <td class="py-4 px-4 text-sm text-slate-300 font-mono">{{ $branch->phone ?? 'N/A' }}</td>
+                                    <td class="py-4 px-4 text-sm text-slate-350 text-center font-semibold">{{ $branch->users_count }} staff</td>
                                     <td class="py-4 px-4 text-sm text-center">
                                         @if($branch->status)
-                                            <span class="px-2.5 py-1 text-xs font-bold bg-emerald-100 text-emerald-800 rounded-full">
+                                            <span class="px-2.5 py-1 text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 rounded-md border border-emerald-500/20">
                                                 Active
                                             </span>
                                         @else
-                                            <span class="px-2.5 py-1 text-xs font-bold bg-gray-100 text-gray-800 rounded-full">
+                                            <span class="px-2.5 py-1 text-[10px] font-bold uppercase bg-slate-800 text-slate-400 rounded-md border border-slate-700">
                                                 Inactive
                                             </span>
                                         @endif
@@ -51,7 +51,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="py-8 text-center text-sm text-gray-500">
+                                    <td colspan="5" class="py-8 text-center text-xs text-slate-500">
                                         No branches found. Click "+ Create New Branch" to register one.
                                     </td>
                                 </tr>

@@ -7,13 +7,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
-#[Fillable(['supplier_id', 'branch_id', 'status', 'total_amount', 'paid_amount', 'payment_status', 'notes', 'ordered_at'])]
+#[Fillable(['offline_id', 'supplier_id', 'branch_id', 'status', 'total_amount', 'paid_amount', 'payment_status', 'notes', 'ordered_at', 'synced_at'])]
 class PurchaseOrder extends Model
 {
     protected $casts = [
         'total_amount' => 'float',
         'paid_amount' => 'float',
-        'ordered_at' => 'datetime'
+        'ordered_at' => 'datetime',
+        'synced_at' => 'datetime',
     ];
 
     public function supplier(): BelongsTo

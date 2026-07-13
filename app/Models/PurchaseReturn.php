@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
-#[Fillable(['purchase_order_id', 'supplier_id', 'refund_amount', 'notes'])]
+#[Fillable(['offline_id', 'purchase_order_id', 'supplier_id', 'refund_amount', 'notes', 'synced_at'])]
 class PurchaseReturn extends Model
 {
     protected $casts = [
-        'refund_amount' => 'float'
+        'refund_amount' => 'float',
+        'synced_at' => 'datetime',
     ];
 
     public function purchaseOrder(): BelongsTo

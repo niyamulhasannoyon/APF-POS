@@ -174,13 +174,13 @@ new class extends Component
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
     <!-- Left: Initiate Stock Transfer Request -->
-    <div class="bg-white p-6 shadow-sm sm:rounded-lg border border-gray-150 h-fit">
-        <h4 class="text-base font-bold text-gray-900 mb-4 flex items-center">
+    <div class="glass-card h-fit">
+        <h4 class="text-base font-extrabold text-slate-100 mb-4 flex items-center gap-2">
             🚚 Request Stock Transfer
         </h4>
         
         @if (session()->has('error'))
-            <div class="mb-4 p-3 bg-rose-100 border-l-4 border-rose-500 text-rose-800 text-xs font-semibold rounded-r">
+            <div class="mb-4 p-3.5 bg-rose-500/10 border-l-4 border-rose-500 text-rose-455 text-xs font-bold rounded-r-lg border border-rose-500/20">
                 {{ session('error') }}
             </div>
         @endif
@@ -188,8 +188,8 @@ new class extends Component
         <form wire:submit.prevent="createTransfer" class="space-y-4">
             <!-- Source Branch -->
             <div>
-                <label class="block text-xs font-semibold text-gray-700">Source Branch (From) *</label>
-                <select wire:model="fromBranchId" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 text-sm">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Source Branch (From) *</label>
+                <select wire:model="fromBranchId" required class="block w-full">
                     @foreach($branches as $b)
                         <option value="{{ $b->id }}">{{ $b->name }}</option>
                     @endforeach
@@ -198,8 +198,8 @@ new class extends Component
 
             <!-- Destination Branch -->
             <div>
-                <label class="block text-xs font-semibold text-gray-700">Destination Branch (To) *</label>
-                <select wire:model="toBranchId" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 text-sm">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Destination Branch (To) *</label>
+                <select wire:model="toBranchId" required class="block w-full">
                     @foreach($branches as $b)
                         <option value="{{ $b->id }}">{{ $b->name }}</option>
                     @endforeach
@@ -208,8 +208,8 @@ new class extends Component
 
             <!-- Product selection -->
             <div>
-                <label class="block text-xs font-semibold text-gray-700">Select Product *</label>
-                <select wire:model="productId" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 text-sm">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Select Product *</label>
+                <select wire:model="productId" required class="block w-full">
                     @foreach($products as $p)
                         <option value="{{ $p->id }}">{{ $p->name }} (SKU: {{ $p->sku }})</option>
                     @endforeach
@@ -218,84 +218,84 @@ new class extends Component
 
             <!-- Quantity -->
             <div>
-                <label class="block text-xs font-semibold text-gray-700">Quantity to Transfer *</label>
-                <input type="number" wire:model="quantity" required min="1" step="1" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 text-sm">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Quantity to Transfer *</label>
+                <input type="number" wire:model="quantity" required min="1" step="1" class="block w-full font-mono">
             </div>
 
             <!-- Notes -->
             <div>
-                <label class="block text-xs font-semibold text-gray-700">Notes / Instructions</label>
-                <textarea wire:model="notes" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 text-sm" placeholder="Specify logistics details..."></textarea>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">Notes / Instructions</label>
+                <textarea wire:model="notes" rows="2" class="block w-full" placeholder="Specify logistics details..."></textarea>
             </div>
 
-            <button type="submit" class="w-full px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-bold shadow transition text-xs">
+            <button type="submit" class="w-full px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold shadow-lg shadow-indigo-500/10 transition text-xs">
                 Submit Request
             </button>
         </form>
     </div>
 
     <!-- Right: Active Transfers Ledger -->
-    <div class="lg:col-span-2 bg-white p-6 shadow-sm sm:rounded-lg border border-gray-150">
-        <h4 class="text-base font-bold text-gray-900 mb-4">
+    <div class="lg:col-span-2 glass-card">
+        <h4 class="text-base font-extrabold text-slate-100 mb-4">
             📋 Stock Transfers Log
         </h4>
 
         <div class="space-y-4 max-h-[600px] overflow-y-auto pr-1">
             @forelse($transfers as $trans)
-                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition hover:bg-gray-100/50">
-                    <div class="space-y-1">
+                <div class="bg-slate-900/40 border border-slate-800/80 rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition hover:bg-slate-900/60">
+                    <div class="space-y-1.5">
                         <div class="flex items-center gap-2 flex-wrap">
-                            <span class="text-xs font-bold font-mono bg-gray-200 text-gray-700 px-2 py-0.5 rounded">#ST-{{ $trans->id }}</span>
-                            <span class="text-xs px-2 py-0.5 rounded-full font-bold uppercase text-[9px]" :class="{
-                                'bg-amber-100 text-amber-800': '{{ $trans->status }}' === 'pending',
-                                'bg-blue-100 text-blue-800': '{{ $trans->status }}' === 'shipped',
-                                'bg-emerald-100 text-emerald-800': '{{ $trans->status }}' === 'completed',
-                                'bg-rose-100 text-rose-800': '{{ $trans->status }}' === 'cancelled'
+                            <span class="text-xs font-bold font-mono bg-slate-800 text-slate-300 border border-slate-700/80 px-2 py-0.5 rounded-md">#ST-{{ $trans->id }}</span>
+                            <span class="text-[9px] px-2 py-0.5 rounded-md font-extrabold uppercase border" :class="{
+                                'bg-amber-500/10 text-amber-300 border-amber-500/20': '{{ $trans->status }}' === 'pending',
+                                'bg-indigo-500/10 text-indigo-300 border-indigo-500/20': '{{ $trans->status }}' === 'shipped',
+                                'bg-emerald-500/10 text-emerald-300 border-emerald-500/20': '{{ $trans->status }}' === 'completed',
+                                'bg-rose-500/10 text-rose-300 border-rose-500/20': '{{ $trans->status }}' === 'cancelled'
                             }">
                                 {{ $trans->status }}
                             </span>
                         </div>
                         
-                        <div class="text-sm font-semibold text-gray-800">
+                        <div class="text-sm font-bold text-slate-200">
                             {{ $trans->fromBranch->name }} ➔ {{ $trans->toBranch->name }}
                         </div>
 
                         <!-- Item details -->
                         @foreach($trans->items as $item)
-                            <div class="text-xs text-gray-600 font-medium">
-                                • {{ $item->product->name }} (Requested: <strong class="text-gray-800">{{ $item->quantity_requested }}</strong>, Transferred: <strong class="text-gray-800">{{ $item->quantity_transferred }}</strong>)
+                            <div class="text-xs text-slate-400 font-semibold">
+                                • {{ $item->product->name }} (Requested: <strong class="text-slate-200">{{ $item->quantity_requested }}</strong>, Transferred: <strong class="text-slate-200">{{ $item->quantity_transferred }}</strong>)
                             </div>
                         @endforeach
 
-                        <div class="text-[10px] text-gray-500">
-                            Requested by: <strong>{{ $trans->user->name }}</strong> on {{ $trans->created_at->format('M d, Y h:ia') }}
+                        <div class="text-[10px] text-slate-500">
+                            Requested by: <strong class="text-slate-400">{{ $trans->user->name }}</strong> on {{ $trans->created_at->format('M d, Y h:ia') }}
                         </div>
                     </div>
 
                     <!-- Actions -->
                     <div class="flex gap-2 flex-wrap select-none md:self-center">
                         @if($trans->status === 'pending')
-                            <button wire:click="shipTransfer({{ $trans->id }})" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold transition shadow-sm">
+                            <button wire:click="shipTransfer({{ $trans->id }})" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold shadow-lg shadow-indigo-650/15 text-xs transition duration-150">
                                 Ship Items
                             </button>
-                            <button wire:click="cancelTransfer({{ $trans->id }})" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 text-gray-750 rounded text-xs font-semibold transition">
+                            <button wire:click="cancelTransfer({{ $trans->id }})" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-bold transition duration-150">
                                 Cancel
                             </button>
                         @elseif($trans->status === 'shipped')
-                            <button wire:click="receiveTransfer({{ $trans->id }})" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs font-bold transition shadow-sm">
+                            <button wire:click="receiveTransfer({{ $trans->id }})" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-bold shadow-lg shadow-emerald-600/15 text-xs transition duration-150">
                                 Receive Items
                             </button>
-                            <button wire:click="cancelTransfer({{ $trans->id }})" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded text-xs font-bold border border-rose-200 transition">
+                            <button wire:click="cancelTransfer({{ $trans->id }})" class="px-3 py-1.5 bg-rose-500/10 hover:bg-rose-500 text-rose-400 hover:text-white rounded-lg text-xs font-bold border border-rose-500/20 shadow-lg shadow-rose-500/5 transition duration-150">
                                 Return / Cancel
                             </button>
                         @endif
                     </div>
                 </div>
             @empty
-                <div class="text-center text-xs text-gray-500 py-12">
+                <div class="text-center text-xs text-slate-550 py-12">
                     No branch transfers initiated yet.
                 </div>
             @endforelse
-        </div>
     </div>
+</div>
 </div>
