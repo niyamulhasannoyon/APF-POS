@@ -174,6 +174,16 @@ const splitCardAmount = ref('');
 const splitMobileAmount = ref('');
 const splitLoyaltyAmount = ref('');
 
+// Payment Verification states
+const cardVerified = ref(false);
+const mobileVerified = ref(false);
+const stripeTrxId = ref('');
+const bkashWallet = ref('');
+const bkashTrxId = ref('');
+const processingStripe = ref(false);
+const stripeProgress = ref('');
+const processingBkash = ref(false);
+
 // Line Item adjustments refs
 const adjustingCartItem = ref(null);
 
@@ -294,7 +304,7 @@ const loadLocalCache = async () => {
 };
 
 const updateCounts = async () => {
-    syncQueueCount.value = await db.pending_orders.count();
+    syncQueueCount.value = (await db.pending_orders.count()) + (await db.returns.count());
     parkedSalesCount.value = await db.parked_orders.count();
 };
 
@@ -390,12 +400,101 @@ const openCheckout = () => {
     splitCardAmount.value = '';
     splitMobileAmount.value = '';
     splitLoyaltyAmount.value = '';
+
+    // Reset payment verification states
+    cardVerified.value = false;
+    mobileVerified.value = false;
+    stripeTrxId.value = '';
+    bkashWallet.value = '';
+    bkashTrxId.value = '';
+    stripeProgress.value = '';
+
     isCheckingOut.value = true;
 };
 
 const closeCheckout = () => {
     isCheckingOut.value = false;
 };
+
+const processStripeTerminal = async () => {
+    const cardAmt = parseFloat(splitCardAmount.value) || 0;
+    if (cardAmt <= 0) return;
+
+    processingStripe.value = true;
+    stripeProgress.value = 'Connecting to Stripe Terminal...';
+    
+    try {
+        const res = await fetch('/api/payment/stripe-intent', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ amount: cardAmt, currency: 'usd' })
+        });
+        
+        if (res.ok) {
+            const data = await res.json();
+            
+            setTimeout(() => {
+                stripeProgress.value = 'Terminal Ready. Please Tap, Swipe, or Insert Card...';
+                
+                setTimeout(() => {
+                    stripeProgress.value = 'Authorizing Transaction...';
+                    
+                    setTimeout(() => {
+                        stripeProgress.value = '';
+                        stripeTrxId.value = data.client_secret.slice(0, 18).toUpperCase();
+                        cardVerified.value = true;
+                        processingStripe.value = false;
+                    }, 1200);
+                }, 1505);
+            }, 1000);
+        }
+    } catch (e) {
+        stripeProgress.value = 'Error initializing terminal connection.';
+        processingStripe.value = false;
+    }
+};
+
+const processBkashVerification = async () => {
+    const mobileAmt = parseFloat(splitMobileAmount.value) || 0;
+    if (mobileAmt <= 0 || !bkashTrxId.value.trim()) {
+        alert("Please enter a valid Transaction ID.");
+        return;
+    }
+
+    processingBkash.value = true;
+    try {
+        const res = await fetch('/api/payment/bkash-verify', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ trx_id: bkashTrxId.value, amount: mobileAmt })
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            mobileVerified.value = true;
+            bkashWallet.value = data.sender;
+        } else {
+            alert("Verification failed. Check the Transaction ID.");
+        }
+    } catch (e) {
+        alert("Error verifying mobile payment.");
+    } finally {
+        processingBkash.value = false;
+    }
+};
+
+const checkoutDisabled = computed(() => {
+    if (amountRemaining.value > 0.01) return true;
+    if (parseFloat(splitCardAmount.value) > 0 && !cardVerified.value) return true;
+    if (parseFloat(splitMobileAmount.value) > 0 && !mobileVerified.value) return true;
+    return false;
+});
 
 const submitCheckout = async () => {
     if (amountRemaining.value > 0.01) {
@@ -419,7 +518,10 @@ const submitCheckout = async () => {
         payment_details: {
             cash: parseFloat(splitCashAmount.value) || 0,
             card: parseFloat(splitCardAmount.value) || 0,
+            card_trx_id: stripeTrxId.value,
             mobile: parseFloat(splitMobileAmount.value) || 0,
+            mobile_wallet: bkashWallet.value,
+            mobile_trx_id: bkashTrxId.value,
             loyalty: parseFloat(splitLoyaltyAmount.value) || 0
         },
         payment_status: 'paid',
@@ -489,20 +591,29 @@ const syncData = async () => {
     isSyncing.value = true;
     try {
         const pending = await db.pending_orders.toArray();
-        if (pending.length > 0) {
+        const pendingReturns = await db.returns.toArray();
+        
+        if (pending.length > 0 || pendingReturns.length > 0) {
             const response = await fetch('/api/pos/sync-push', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
-                body: JSON.stringify({ orders: pending })
+                body: JSON.stringify({ orders: pending, returns: pendingReturns })
             });
             if (response.ok) {
                 const result = await response.json();
-                if (result.success && result.synced_offline_ids) {
-                    for (const id of result.synced_offline_ids) {
-                        await db.pending_orders.delete(id);
+                if (result.success) {
+                    if (result.synced_offline_ids) {
+                        for (const id of result.synced_offline_ids) {
+                            await db.pending_orders.delete(id);
+                        }
+                    }
+                    if (result.synced_offline_return_ids) {
+                        for (const id of result.synced_offline_return_ids) {
+                            await db.returns.delete(id);
+                        }
                     }
                 }
             }
@@ -970,15 +1081,43 @@ onUnmounted(() => {
                             </div>
 
                             <!-- Card Payment -->
-                            <div class="flex items-center justify-between gap-4 bg-slate-900/40 p-2 border border-slate-700 rounded-lg">
-                                <label class="text-xs font-bold text-slate-300 w-32">💳 Credit Card</label>
-                                <input type="number" v-model="splitCardAmount" placeholder="0.00" class="bg-slate-900 border border-slate-700 text-slate-100 px-3 py-1.5 rounded text-sm text-right font-mono outline-none focus:border-indigo-500 flex-1" step="0.01" min="0">
+                            <div class="flex flex-col gap-2 bg-slate-900/40 p-2 border border-slate-700 rounded-lg">
+                                <div class="flex items-center justify-between gap-4">
+                                    <label class="text-xs font-bold text-slate-300 w-32">💳 Credit Card</label>
+                                    <input type="number" v-model="splitCardAmount" placeholder="0.00" class="bg-slate-900 border border-slate-700 text-slate-100 px-3 py-1.5 rounded text-sm text-right font-mono outline-none focus:border-indigo-500 flex-1" step="0.01" min="0">
+                                </div>
+                                <div v-if="parseFloat(splitCardAmount) > 0" class="border-t border-slate-800/85 pt-2 flex flex-col gap-1.5">
+                                    <div class="flex justify-between items-center text-xs">
+                                        <span class="text-slate-400 font-semibold">Stripe Reader Status:</span>
+                                        <span v-if="cardVerified" class="text-emerald-400 font-bold">Verified ✅ ({{ stripeTrxId }})</span>
+                                        <span v-else-if="processingStripe" class="text-indigo-400 font-semibold animate-pulse">{{ stripeProgress }}</span>
+                                        <span v-else class="text-amber-400 font-semibold">Card Swipe Needed</span>
+                                    </div>
+                                    <button type="button" @click="processStripeTerminal" v-if="!cardVerified" :disabled="processingStripe" class="w-full bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 text-xs py-1.5 rounded border border-indigo-500/20 font-bold transition cursor-pointer">
+                                        {{ processingStripe ? 'Reader Processing...' : '⚡ Trigger Stripe Reader Mock' }}
+                                    </button>
+                                </div>
                             </div>
 
                             <!-- Mobile Payment -->
-                            <div class="flex items-center justify-between gap-4 bg-slate-900/40 p-2 border border-slate-700 rounded-lg">
-                                <label class="text-xs font-bold text-slate-300 w-32">📱 Mobile Pay</label>
-                                <input type="number" v-model="splitMobileAmount" placeholder="0.00" class="bg-slate-900 border border-slate-700 text-slate-100 px-3 py-1.5 rounded text-sm text-right font-mono outline-none focus:border-indigo-500 flex-1" step="0.01" min="0">
+                            <div class="flex flex-col gap-2 bg-slate-900/40 p-2 border border-slate-700 rounded-lg">
+                                <div class="flex items-center justify-between gap-4">
+                                    <label class="text-xs font-bold text-slate-300 w-32">📱 Mobile Pay</label>
+                                    <input type="number" v-model="splitMobileAmount" placeholder="0.00" class="bg-slate-900 border border-slate-700 text-slate-100 px-3 py-1.5 rounded text-sm text-right font-mono outline-none focus:border-indigo-500 flex-1" step="0.01" min="0">
+                                </div>
+                                <div v-if="parseFloat(splitMobileAmount) > 0" class="border-t border-slate-800/85 pt-2 flex flex-col gap-2">
+                                    <div class="flex justify-between items-center text-xs">
+                                        <span class="text-slate-400 font-semibold">bKash Verification:</span>
+                                        <span v-if="mobileVerified" class="text-emerald-400 font-bold">Verified ✅ (Wallet: {{ bkashWallet }})</span>
+                                        <span v-else class="text-amber-500 font-semibold">Enter TrxID</span>
+                                    </div>
+                                    <div v-if="!mobileVerified" class="flex gap-2">
+                                        <input type="text" v-model="bkashTrxId" placeholder="Enter bKash TrxID" class="bg-slate-950 border border-slate-750 text-slate-100 text-xs px-2.5 py-1.5 rounded flex-1 outline-none">
+                                        <button type="button" @click="processBkashVerification" :disabled="processingBkash || !bkashTrxId.trim()" class="bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/20 px-3 py-1.5 rounded text-xs font-bold transition cursor-pointer">
+                                            Verify
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Loyalty Points Payment -->
@@ -1000,7 +1139,7 @@ onUnmounted(() => {
                         <span>${{ changeDue.toFixed(2) }}</span>
                     </div>
                     
-                    <button @click="submitCheckout" class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-lg text-sm transition mt-2 cursor-pointer shadow-md" :disabled="amountRemaining > 0.01">
+                    <button @click="submitCheckout" class="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3.5 rounded-lg text-sm transition mt-2 cursor-pointer shadow-md" :disabled="checkoutDisabled">
                         {{ t('complete_sale') }}
                     </button>
                 </div>

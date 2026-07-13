@@ -19,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Livewire\Livewire::component('⚡stock-transfer-manager', \App\Livewire\StockTransferManager::class);
+        \Livewire\Livewire::component('⚡supplier-directory', \App\Livewire\SupplierDirectory::class);
+        \Livewire\Livewire::component('⚡purchase-manager', \App\Livewire\PurchaseManager::class);
+        \Livewire\Livewire::component('⚡staff-manager', \App\Livewire\StaffManager::class);
+        \Livewire\Livewire::component('⚡report-dashboard', \App\Livewire\ReportDashboard::class);
     }
 }
