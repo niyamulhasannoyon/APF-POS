@@ -1,3 +1,5 @@
 {
-  "outputDirectory": "public"
+  "buildCommand": "cd next-pos && npm run build",
+  "devCommand": "cd next-pos && npm run dev",
+  "installCommand": "cd next-pos && npm install"
 }
